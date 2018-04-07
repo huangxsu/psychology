@@ -12,6 +12,18 @@
         .el-upload-dragger {
             width: 100%;
         }
+
+        .el-table .warning-row,
+        .el-table .warning-row:hover,
+        .el-table .warning-row:hover>td {
+            background: oldlace !important;
+        }
+
+        .el-table .success-row,
+        .el-table .success-row:hover,
+        .el-table .success-row:hover>td {
+            background: #f0f9eb !important;
+        }
     </style>
 </head>
 
@@ -48,12 +60,12 @@
                     <div>预设总数:{{code.total}}</div>
                     <div>实际总数:{{code.data.length}}</div>
                     <div>正确数:{{code.successCount}}</div>
-                    <div>预设正确率:{{code.successCount/code.total}}</div>
-                    <div>实际正确率:{{code.successCount/code.data.length}}</div>
+                    <div>预设正确率:{{code.total && code.successCount/code.total}}</div>
+                    <div>实际正确率:{{code.data.length && code.successCount/code.data.length}}</div>
                     <div>总正确反应时:{{code.totalTimeDiff}}</div>
-                    <div>平均反应时:{{code.successCount && (code.totalTimeDiff / code.successCount)}}</div>
+                    <div>平均反应时:{{code.successCount && code.totalTimeDiff / code.successCount}}</div>
                 </el-alert>
-                <el-table :data="formatForDisplay(code.data)" :span-method="spanMethod">
+                <el-table :data="formatForDisplay(code.data)" :span-method="spanMethod" :row-class-name="tableRowClassName">
                     <el-table-column prop="realTrial" label="realTrial"></el-table-column>
                     <el-table-column label="isCorrect">
                         <template slot-scope="scope">

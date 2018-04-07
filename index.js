@@ -98,10 +98,7 @@
           key: "T",
           validator: function(p, evt) {
             var res = p.responses;
-            if (res.length > 2) res.length = 2;
-            if (res.length == 1) {
-              if (res[0].Code == 3) return res[0];
-            } else if (res.length == 2) {
+            if (res.length >= 2) {
               if (
                 (res[0].Code == 3 && res[1].Code != 3) ||
                 (res[0].Code != 3 && res[1].Code == 3)
@@ -109,10 +106,13 @@
                 if (res[0].Code == 3) return res[0];
                 if (res[1].Code == 3) return res[1];
               }
+            } else if (res.length === 1) {
+              if (res[0].Code == 3) return res[0];
             }
           },
           data: [],
           totalTimeDiff: 0,
+          successCount: 0,
           total: 120
         }
       ]
@@ -144,6 +144,14 @@
           self.getData(this.result);
         };
       },
+      tableRowClassName({ row, rowIndex }) {
+        if (row.isCalTimeDiff) {
+          return "success-row";
+        } else if (row.isCorrect) {
+          return "warning-row";
+        }
+        return "";
+      },
       spanMethod: function({ row, column, rowIndex, columnIndex }) {
         if (columnIndex === 0 || columnIndex === 1) {
           if (row["Event Type"] === "Picture") {
@@ -174,6 +182,11 @@
               if (rightRes) {
                 successCount++;
                 totalTimeDiff += rightRes.timeDiff;
+                pic.responses.forEach(function(r) {
+                  r.isCorrect = true;
+                  r.isCalTimeDiff = false;
+                });
+                rightRes.isCalTimeDiff = true;
               }
               pic.isCorrect = !!rightRes;
               return pic;
