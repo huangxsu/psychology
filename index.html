@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>心理实验</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .el-upload,
+        .el-upload-dragger {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <el-upload class="upload-demo" drag :on-exceed="handleOnExceed" action="" :multiple="false" :auto-upload="false" :on-change="handleFileChange">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将文件拖到此处，或
+                <em>点击上传</em>
+            </div>
+        </el-upload>
+        <el-tabs v-model="tab">
+            <el-tab-pane label="原始数据" name="source">
+                <el-table :data="log.data">
+                    <el-table-column v-for="key in log.keys" :prop="key" :label="key"></el-table-column>
+                </el-table>
+            </el-tab-pane>
+            <el-tab-pane label="整理结果" name="formatted">
+                <el-table :data="formatForDisplay(pictures)" :span-method="spanMethod">
+                    <el-table-column prop="realTrial" label="realTrial"></el-table-column>
+                    <el-table-column label="isCorrect">
+                        <template slot-scope="scope">
+                            {{scope.row.isCorrect}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="Event Type" label="Event Type"></el-table-column>
+                    <el-table-column prop="Code" label="Code"></el-table-column>
+                    <el-table-column prop="Time" label="Time"></el-table-column>
+                    <el-table-column prop="timeDiff" label="timeDiff"></el-table-column>
+                </el-table>
+            </el-tab-pane>
+            <el-tab-pane v-for="code in result" :label="code.key" :name="code.key">
+                <el-alert title="统计数据" type="info" show-icon>
+                    <div>预设总数:{{code.total}}</div>
+                    <div>实际总数:{{code.data.length}}</div>
+                    <div>正确数:{{code.successCount}}</div>
+                    <div>预设正确率:{{code.successCount/code.total}}</div>
+                    <div>实际正确率:{{code.successCount/code.data.length}}</div>
+                    <div>总正确反应时:{{code.totalTimeDiff}}</div>
+                    <div>平均反应时:{{code.successCount && (code.totalTimeDiff / code.successCount)}}</div>
+                </el-alert>
+                <el-table :data="formatForDisplay(code.data)" :span-method="spanMethod">
+                    <el-table-column prop="realTrial" label="realTrial"></el-table-column>
+                    <el-table-column label="isCorrect">
+                        <template slot-scope="scope">
+                            {{scope.row.isCorrect}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="Event Type" label="Event Type"></el-table-column>
+                    <el-table-column prop="Code" label="Code"></el-table-column>
+                    <el-table-column prop="Time" label="Time"></el-table-column>
+                    <el-table-column prop="timeDiff" label="timeDiff"></el-table-column>
+                </el-table>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
+    <script src="./index.js?v=3"></script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+picture: event_type=="Picture" 
+response:event_type=="Response"
+picture_count=count(picture)
+response_count=count(response)
+effective_pic:picture and [rel_index==index+1] is response  
+effective_res:response and [rel_index==index-1] is pictured
+effec_count_pic=count(effective_pic)
+effec_count_res=count(effective_res)
+pic_match_res::direct_match(effective_pic,effective_res)
+ 
+newT(pic_match_res)::code1 contains "NT" 
+newD(pic_match_res)::code1 contains "ND"  
+deepT(pic_match_res)::code1 contains "AT"   
+deepD(pic_match_res)::code1 contains "AD" 
+shallowT1(pic_match_res)::code1 contains "B1T"  
+shallowD1(pic_match_res)::code1 contains "B1D"  
+shallowT2(pic_match_res)::code1 contains "B2T"  
+shallowD2(pic_match_res)::code1 contains "B2D"
+count_newT=count(newT) 
+count_newD=count(newD)
+count_deepT=count(deepT) 
+count_deepD=count(deepD)
+count_shallowT1=count(shallowT1) 
+count_shallowD1=count(shallowD1) 
+count_shallowT2=count(shallowT2)
+count_shallowD2=count(shallowD2)
+
+newT_hit(pic_match_res)::code1 contains "NT" and code2 contains "2" 
+newD_hit(pic_match_res)::code1 contains "ND" and code2 contains "2" 
+deepT_hit(pic_match_res)::code1 contains "AT" and code2 contains "1" 
+deepD_hit(pic_match_res)::code1 contains "AD" and code2 contains "1"  
+shallowT1_hit(pic_match_res)::code1 contains "B1T" and code2 contains "1"   
+shallowD1_hit(pic_match_res)::code1 contains "B1D" and code2 contains "1"  
+shallowT2_hit(pic_match_res)::code1 contains "B2T" and code2 contains "1"   
+shallowD2_hit(pic_match_res)::code1 contains "B2D" and code2 contains "1"  
+               
+count_deepT_hit=count(deepT_hit)   
+count_deepD_hit=count(deepD_hit)
+count_shallowT1_hit=count(shallowT1_hit) 
+count_shallowD1_hit=count(shallowD1_hit) 
+count_shallowT2_hit=count(shallowT2_hit) 
+count_shallowD2_hit=count(shallowD2_hit)
+count_newT_hit=count(newT_hit)  
+count_newD_hit=count(newD_hit) 
+
+event_pair_table pststim_table(code1,code2,time_diff)
+avg_newT_hit=avg(newT_hit,time_diff) 
+avg_newD_hit=avg(newD_hit,time_diff) 
+avg_deepT_hit=avg(deepT_hit,time_diff)   
+avg_deepD_hit=avg(deepD_hit,time_diff)
+avg_shallowT1_hit=avg(shallowT1_hit,time_diff)  
+avg_shallowD1_hit=avg(shallowD1_hit,time_diff)   
+avg_shallowT2_hit=avg(shallowT2_hit,time_diff)  
+avg_shallowD2_hit=avg(shallowD2_hit,time_diff)
+
+
+规则说明：
+1.所有数据第一行的Response按键都是4，表示看完指导语后按 回车键 正式进入实验，回车键被定义为代码4，其实这一行的数据不需要计入分析的。
+2.正确的trial有两种前提条件是：
+第一、有T（也就是pic的代码里含有AT或B1T或B2T或NT）出现的，要有3，并且反应要为2个（而不是小于等于2？），另一个反应为按键1或者按键2（这样可以排除两个都是按键3的乱按情况）；
+这里有一个问题，如果T出现，被试只按了3，其实这个trial是错误的，因为被试只进行了一个任务的反应，应该还需进行一个按键1或者2的任务反应。但是就按键3这个任务被试的反应确是正确的，我也需要统计按键3这个反应的反应时间和正确率的，这样似乎又和“有T出现的，要按3，并且反应要为2个（而不是小于等于2？）”有点矛盾感觉，所以这个问题不知道何解？ 
+
+第二、没有T（也就是pic的代码里含有AD或B1D或B2D或ND）出现的不能有3，并且反应只能有1个（而不是小于等于1？），反应为按键1或者按键2。
+
+3.在满足第2点所述的前提条件下，有A、B1、B2、出现的（也就是pic的代码里含有AT或AD或B1T或B1D或B2T或B2D）还要按1，有N（也就是pic的代码里含有NT或ND）出现的要按2。
+
+4.同时满足上述第2和第3点的trial才是正确的，我需要的数据就是正确的trial的两个任务（按键3\按键1或2）的正确率和反应时,也就是正确的trial中的按键3这个任务的正确率（正确个数除以总个数，所以正确个数和总个数都需要统计出来）和反应时间（这个反应时间最后应该是个平均反应时间值，即每个正确的trial中的按键3的反应时间的平均反应时间值）以及正确的trial中的AT、AD、B1T、B1D、B2T、B2D、NT、ND的正确率也就是按键1或2这个任务的正确率（正确个数除以总个数，所以正确个数和总个数都要统计出来）和它们各自对应的反应时（这个反应时间最后应该是个平均反应时间值，即每个正确的trial中各自的反应时间的平均反应时间）。
+可以参考上面代码中的count及avg_的语句加以理解。
+
+5.最后结果希望能生成一个文本格式，以方便excel能直接打开，不然我还得手动输入到excel中进行分析。
